@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>O modelo Massa-Mola</title>
+
+
+  <link rel="stylesheet" type="text/css" href="https://jsxgraph.org/distrib/jsxgraph.css" />
+  <script type="text/javascript" src="https://jsxgraph.org/distrib/jsxgraphcore.js"></script>
+
+
+  <script>
+    // DEFINING SOME COLORS ------------------------------------------------------
+
+    var backgroundColor = "mintcream"  //"aliceblue" //  "honeydew"  // "azure"  // #EAFAF1";
+    var myBlue = "lightskyblue"  //"#5DADE2"   #ADD8E6
+    var myYellow = "khaki"   //"lightyellow"  //#F4D03F"
+    var myRed = "tomato"   //"#E74C3C"
+    var texColor = "darkgreen"
+
+    // Before loading MathJax, it has to be configured something like this:
+    MathJax = {
+      loader: { load: ['[tex]/color'] },
+
+      styles: {
+        '.mjx-chtml': { padding: '0.1em 0.1em', color: texColor }   // "#2e7d32"
+      },
+      tex2jax: {
+        inlineMath: [
+          ["$", "$"],
+          ["\\(", "\\)"],
+        ],
+        processEscapes: true,
+        displayMath: [
+          ["$$", "$$"],
+          ["\\[", "\\]"],
+        ],
+        packages: ["base", "ams", "color"],
+      },
+      CommonHTML: {
+        scale: 105,
+        linebreaks: { automatic: false }
+      },
+      options: {
+        ignoreHtmlClass: "tex2jax_ignore",
+        processHtmlClass: "tex2jax_process",
+      },
+    };
+
+
+  </script>
+
+
+  <!-- <script>
+    // MathJax 3 configuration
+    window.MathJax = {
+    tex: {
+    inlineMath: [
+    ["$", "$"],
+    ["\\(", "\\)"],
+    ],
+    processEscapes: true,
+    displayMath: [
+    ["$$", "$$"],
+    ["\\[", "\\]"],
+    ],
+    autoload: {
+    color: [],
+    colorv2: ['color']
+    },
+    packages: { '[+]': ['noerrors'] }
+    },
+    chtml: {
+    scale: 1.05
+    },
+    options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+    },
+    loader: {
+    load: ['input/asciimath', '[tex]/noerrors']
+    }
+    };
+  </script> -->
+
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+
+  <!-- <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script> -->
+
+
+  <style>
+    root {
+      font-size: 62.5%;
+      /* Apparently this is the best way to setup the font-size in all browsers! */
+    }
+
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", Times, serif;
+    }
+
+    /* when width is small it is set as the height, otherwise height = 480px everywhere....! */
+
+    #container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      align-content: start;
+      padding: 0 2em;
+      font-size: 0.8rem;
+      /* 0.8rem = 16px */
+    }
+
+    #wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      /* the wrapper also contains the caption  */
+    }
+
+    #jxgbox {
+      /* aspect-ratio: 2/1;  not working by itself in ipad....   */
+      width: 76vw;
+      height: 40vw;
+
+      /* we need numerical values in order to fullScreen works properly */
+
+    }
+
+    /* for small screens we really need to reduce the font size to 13px */
+    @media screen and (max-width: 360px) {
+      #container {
+        font-size: 0.65rem;
+        padding: 3em;
+      }
+
+      #jxgbox {
+        width: 90vw;
+        /* small screen bigger */
+      }
+    }
+
+
+    @media screen and (min-width:640) and (max-width: 960px) {
+      #container {
+        font-size: 0.9rem;
+        /* 18px */
+      }
+    }
+
+    @media screen and (min-width: 961px) {
+      #container {
+        font-size: 1rem;
+        /* 1rem = 20px */
+      }
+    }
+
+
+    /* @media screen and (min-width:641) and (max-width: 960px) {
+
+        html,
+        body {
+          font-size: 16px;
+        }
+      }
+
+      @media screen and (min-width: 961) and (max-width: 1904px) {
+
+        html,
+        body {
+          font-size: 18px;
+        }
+      }
+
+
+      @media screen and (min-width: 1904px) and (max-width: 1264) {
+
+        html,
+        body {
+          font-size: 20px;
+        }
+      }
+  */
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <h2>O Sistema Massa-Mola com Impulso</h2>
+    <!-- <p> $$ \color{red}{m} \, u'' + \color{red}{\gamma}\, u' + \color{red}{k}\, u = \color{red}{F_0}\, \cos(
+      \color{red}{\omega} t)$$</p> -->
+    <div id="wrapper">
+      <div id="jxgbox" class="jxgbox"></div>
+
+      <p style="font-size: 0.8em;">Puxe levemente a massa para coloca-la em movimento. Digite o valor de $\omega$, a
+        frequência da força
+        externa:
+
+        <input type="text" id="inputOmega2" placeholder="1.9" style="width: 5em; height: 2em; color: black;
+      background-color: mintcream" />
+      </p>
+    </div>
+
+
+    <div>
+      <p> A posição $u(t)$ (na vertical) de uma massa presa a duas molas corresponde à equação diferencial:
+        $$ \text{(1)} \quad \color{royalblue}{m} \, u'' + \color{royalblue}{\gamma}\, u' + \color{royalblue}{k}\,
+        u=\color{royalblue}{F_0}\, \cos(\color{royalblue}{\omega} t),$$ que se obtém ao usar a segunda lei de Newton:
+        $$ m \, u''=\sum \text{forças}=\text{Peso} + F_m + F_a + F_e $$ onde:
+      <ol>
+        <li> \( m \) é a massa do objeto;</li></br>
+        <li> \( F_m = -k \, (\ell + u) \) é a força exercida pela primeira mola, segundo a famosa lei de Hooke. Nesta
+          modelagem o
+          sistema fica em
+          equilíbrio quando o estiramento da mola é $ \ell $, i.e., temos $ \text{Peso} = k\ell, $ desta forma o Peso
+          e
+          o termo $-k\ell$ desaparecem da equação ;</li></br>
+        <li> \( F_a = -\gamma \, u' \) é a força de amortecimento. Uma aproximação mais realista
+          seria $ F_a = -\gamma \, (u')^2 $ mas neste caso a equação não ficaria linear e não seria
+          possível resolve-la manualmente ;</li></br>
+        <li> $ F_e(t) = F_0\, \cos(\omega t) $ é uma força externa, que
+          corresponde no exemplo a uma segunda mola que oscila com uma frequência \(
+          \omega \) e
+          ${F_0}$ e um
+          coeficiente que usamos para modificar a magnitude desta força, por exemplo se $F_0 = 0 $ então o movimento é
+          não
+          forçado ;</li><br>
+        <li>A frequência natural do sistema,
+          $ \color{royalblue}{\omega_0} = \color{royalblue}{\sqrt{k/m} }$
+          será fixada neste exemplo: $ \omega_0 = 2. $</li>
+      </ol>
+
+      A solução da equação diferencial (1) tem a forma $$ u(t) = u_h(t) + u_p(t) $$ onde $u_h(t) =
+      \color{darkgreen}{c_1}
+      u_1(t) + \color{darkgreen}{c_2} u_2(t) $ é a solução geral da equação homogênea associada e $u_p(t) $ é uma
+      solução
+      particular de (1).
+
+
+      <ol type="I">
+        <li>
+          Consideramos primeiro o caso com amortecimento, i.e., \( \gamma \neq 0. \)
+        </li>
+        <section>
+          <p>
+            Neste caso é possível mostrar que a parte homogênea se dissipa
+            com o passar do tempo: $$\lim_{t\to\infty} u_h(t) = 0,$$ isto porque aparece uma exponencial
+            $\text{e}^{-c\gamma t}$ com $c>0,$ que mata a parte homogênea. Sendo assim, a solução $u(t)$ de (1)
+            converge para a solução particular.
+
+            Por esta razão $u_h(t)$ é chamada de solução <strong>transiente</strong> e
+            $u_p(t)$ é chamada de solução <strong>estacionária ou forçada.</strong>
+            Note que as condições iniciais só determinam os parâmetros
+            $\color{green}{c_1}$ e $\color{green}{c_2}$ e portanto as condições iniciais não influenciam o
+            comportamento
+            assintótico da solução.
+          </p>
+
+          </br>
+          <p>
+            <u><strong>Ressonância:</strong></u> Podemos verificar na animação que se o amortecimento for muito
+            pequeno
+            e
+            a
+            frequência externa
+            $\omega$ for muito próxima ou igual à frequência natural $\omega_0=2,$
+            então a amplitude do movimento fica grande mesmo fazendo o coeficiente $F_0$ muito pequeno (mas maior que
+            $\gamma$). Isto é chamado de ressonância
+            e é muito importante em projetos de engenharia, pois pequenas ressonâncias podem colapsar uma estrutura.
+            De
+            fato, se deixamos variar $\omega$ e fixamos todos os demais parâmetros do problema, pode-se mostrar que a
+            solução particular toma a forma
+            $$ u_p(t) = R(\omega) \cos(\omega t - \delta(\omega)), $$ onde a amplitude $R(\omega)$ é uma função da
+            frequência externa $\omega$
+            cuja
+            expressão vamos omitir neste texto. O importante é que ela satisfaz que
+            $ R(0)= F_0/k > 0 $ e $ R(\infty) = 0. $ Isto implica que
+            $R(\omega)$ apresenta um
+            ponto de máximo para $\omega \ge 0.$ Procura-se um ponto de máximo $\omega_{max}$ que seja estritamente
+            positivo, onde deve acontecer que $R'(\omega_{max}) = 0$. Descobre-se que $\omega_{max}$ satisfaz a
+            equação
+            $$
+            \omega_{max}^2
+            = \omega_0^2 \left(1-\gamma^2/2km \right). $$ Então $\omega_{max}$ é imaginário se $ \gamma^2 > 2km, $
+            i.e.,
+            o máximo acontece em $\omega_{max} = 0$ e $R(\omega)$ é uma função decrescente.
+            </br>
+            Agora se $\gamma$ é pequeno, $0 \lt \gamma^2 \lt 2km,$ então $\omega_{max} > 0.$ Observa-se que se
+            $\gamma$
+            for muito
+            pequeno, $\omega_{max} \approx \omega_0$ e a amplitude máxima é
+            aproximadamente igual a $$R(\omega_{max}) \approx {F_0\over \gamma\omega_0}.$$ Desta forma, se $\gamma$
+            for muito pequeno, a amplitude do movimento pode ser muito grande, mesmo que a força externa seja pequena,
+            basta que o quociente $F_0/\gamma$ seja muito grande.
+          </p>
+
+        </section>
+
+        <section>
+
+          <p> Finalmente notamos que, se o forçamento for não nulo ($F_0\neq 0$), e houver amortecimento ($\gamma\neq
+            0$),
+            então a amplitude do movimento $u(t)$ tende para zero quando $\omega\to\infty.$ Isto porque a
+            amplitude da solução particular tende para zero quando $\omega \to\infty.$ Você pode verificar estes fatos
+            digitando os valores de $\omega$ no input acima.
+          </p>
+        </section>
+
+        </br>
+        <li>
+          Vamos a supor agora que não há amortecimento, i.e., \( \gamma = 0. \)
+        </li>
+
+        <section>
+          <p>Neste caso a solução geral da equação homogênea associada $m\, u'' + k\, u = 0$ é sempre
+            $$ u_h(t) = \color{green}{c_1} \cos(\omega_0\, t) + \color{green}{c_2}
+            \sin(\omega_0\, t),\, \omega_0 = \sqrt{k/m}. $$ Aqui consideramos dois casos:
+          </p>
+          <ol type="i">
+            <li>
+              <p>
+                Se $ \omega_0 \neq \omega, $ então a solução particular de (1) é dada por
+                $$
+                u_p(t) = A_0 \, \cos(\omega t) $$ onde $A_0 = F_0/ m(\omega_0^2 -\omega^2)$ (usar o método dos
+                coeficientes
+                indeterminados).
+              </p>
+
+              <p>
+                <u><strong>Batimentos:</strong></u>
+                Se a frequência da força externa for próxima, mas diferente da frequência natural do sistema
+                (digamos $\omega = 1.9$), então pode acontecer o fenômeno conhecido como
+                batimentos. Isto acontece por exemplo quando as condições
+                iniciais são $ u(0) = u'(0) = 0. $ Neste caso a solução geral da equação (1) é da forma
+                <!-- $$ u(t) = \color{green}{c_1} \cos(\omega_0\, t) + \color{green}{c_2}
+                    \sin(\omega_0\, t) + A_0 \cos(\omega t) $$ e no caso especial de  temos -->
+                $$ u(t) = A_0 \left( \cos(\omega\, t) - \cos(\omega_0 t)\right) $$ que pode
+                ser escrita como
+                $$ u(t) = R(t)\sin\left({\omega_0 +
+                \omega \over 2}\, t\right) $$ onde
+                $ R(t) = 2 A_0\sin\left({(\omega_0-\omega) \over 2}\, t\right) $
+                que corresponde a uma
+                amplitude oscilante com uma frequência pequena $({\omega_0-\omega})/2. $ O movimento da massa é então
+                uma
+                oscilação
+                $\sin({(\omega_0
+                + \omega) \over 2}\, t)$ (com uma frequência maior $(\omega_0+\omega)/2$), e que oscila entre os
+                gráficos das funções $-R(t)$ e $+R(t).$
+              </p>
+            </li>
+
+
+
+            <li>
+              <p>
+                Se $\omega = \omega_0$ então a solução particular de (1) é dada por
+                $$
+                u_p(t)
+                = t\cdot ({F_0\over 2\omega_0}) \sin(\omega_0\, t), $$ (use o método dos coeficientes indeterminados).
+
+              </p>
+              <p>
+                <u><strong>Ressonância:</strong></u>
+                Se a frequência externa
+                $\omega$ for igual à frequência natural $\omega_0$ do sistema
+                então a amplitude do movimento aumenta (linearmente) com o passar do tempo, isto é, de novo temos o
+                fenômeno de
+                ressonância. Isto acontece porque
+                <!-- deve ter a forma $$ u_p(t)
+                = t\cdot \left( \color{green}{A} \cos(\omega_0\, t) + \color{green}{B}
+                \sin(\omega_0\, t) \right), $$ e usando o método dos coeficientes indeterminados obtemos -->
+                a solução geral
+                da equação (1) é dada por $u(t) = u_h(t) + u_p(t)$ onde
+                $$ u_h(t) = \color{green}{c_1} \cos(\omega_0\, t) + \color{green}{c_2}
+                \sin(\omega_0\, t) $$ que permanece limitada quando o tempo vai a infinito
+                enquanto o módulo de $u_p(t)$ cresce linearmente quando o tempo aumenta por causa do termo $t \gt 0 $.
+              </p>
+            </li>
+
+
+
+          </ol>
+
+
+
+
+        </section>
+
+
+
+
+
+      </ol>
+
+
+    </div>
+  </div>
+
+
+
+  <script src="massa-mola-definitions.js"></script>
+  <script src="massa-mola-impulso.js"></script>
+
+
+</body>
+
+</html>
